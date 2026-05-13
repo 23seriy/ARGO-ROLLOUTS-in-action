@@ -184,6 +184,12 @@ steps:
   - setWeight: 100
 ```
 
+Apply the manifest:
+
+```bash
+kubectl apply -f rollouts/canary-manual.yaml
+```
+
 The rollout parks at 10% and waits. You can test, check dashboards, talk to your team, sleep on it — then advance when you're ready:
 
 ```bash
