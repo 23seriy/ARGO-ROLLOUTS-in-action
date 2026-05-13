@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: scores-api
+  namespace: argo-rollouts-demo
+  labels:
+    app: scores-api
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: scores-api
+  template:
+    metadata:
+      labels:
+        app: scores-api
+    spec:
+      containers:
+        - name: scores-api
+          image: scores-api:v1
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_VERSION
+              value: "v1"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+  strategy:
+    canary:
+      canaryService: scores-api-canary
+      stableService: scores-api-stable
+      steps:
+        - setWeight: 10
+        - pause: {duration: 30s}
+        - setWeight: 30
+        - pause: {duration: 30s}
+        - setWeight: 60
+        - pause: {duration: 30s}
+        - setWeight: 100

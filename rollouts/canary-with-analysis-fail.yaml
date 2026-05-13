@@ -1,0 +1,63 @@
+# Canary that WILL fail analysis — used to demo automatic rollback.
+# The ERROR_RATE=0.4 means 40% of requests return 500s → analysis detects
+# the bad success rate and triggers an automatic rollback.
+# Like a player getting ejected mid-game for too many fouls.
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: scores-api
+  namespace: argo-rollouts-demo
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: scores-api
+  template:
+    metadata:
+      labels:
+        app: scores-api
+    spec:
+      containers:
+        - name: scores-api
+          image: scores-api:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_VERSION
+              value: "v2"
+            - name: ERROR_RATE
+              value: "0.4"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+  strategy:
+    canary:
+      canaryService: scores-api-canary
+      stableService: scores-api-stable
+      analysis:
+        templates:
+          - templateName: success-rate
+        startingStep: 1
+        args:
+          - name: service-name
+            value: scores-api-canary.argo-rollouts-demo.svc.cluster.local:8080
+      steps:
+        - setWeight: 10
+        - pause: {duration: 20s}
+        - setWeight: 30
+        - pause: {duration: 20s}
+        - setWeight: 60
+        - pause: {duration: 20s}
+        - setWeight: 100

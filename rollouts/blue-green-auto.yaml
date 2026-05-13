@@ -1,0 +1,48 @@
+# Blue-Green with auto-promotion after 60 seconds.
+# Like a timeout that automatically ends — play resumes with the new lineup.
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: scores-api
+  namespace: argo-rollouts-demo
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: scores-api
+  template:
+    metadata:
+      labels:
+        app: scores-api
+    spec:
+      containers:
+        - name: scores-api
+          image: scores-api:v2
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_VERSION
+              value: "v2"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+  strategy:
+    blueGreen:
+      activeService: scores-api-stable
+      previewService: scores-api-canary
+      autoPromotionEnabled: true
+      autoPromotionSeconds: 60
+      previewReplicaCount: 2
+      scaleDownDelaySeconds: 30

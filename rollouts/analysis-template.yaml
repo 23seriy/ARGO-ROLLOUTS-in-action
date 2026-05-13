@@ -1,0 +1,28 @@
+# AnalysisTemplate — queries Prometheus to check if the canary version
+# has an acceptable success rate (≥ 95%).
+# Like checking the box score at halftime — if the numbers look bad,
+# pull the starter and revert to the bench.
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+  namespace: argo-rollouts-demo
+spec:
+  args:
+    - name: service-name
+  metrics:
+    - name: success-rate
+      interval: 20s
+      count: 3
+      failureLimit: 1
+      successCondition: result[0] >= 0.95
+      provider:
+        prometheus:
+          address: http://prometheus.argo-rollouts-demo.svc.cluster.local:9090
+          query: |
+            sum(rate(
+              scores_api_requests_total{status="200"}[1m]
+            )) /
+            sum(rate(
+              scores_api_requests_total[1m]
+            ))
