@@ -7,7 +7,7 @@ A hands-on project demonstrating **Argo Rollouts** progressive delivery on a loc
 ![Minikube](https://img.shields.io/badge/Minikube-local-F7B93E?logo=kubernetes&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 
-> 📝 **Read the full walkthrough on Medium:** *[link coming soon]*
+> 📝 **Read the full walkthrough on Medium:** [Argo Rollouts in Action: Progressive Delivery with Canary, Blue-Green, and Automated Analysis on Your Laptop](https://medium.com/@sergeiolshanetski/argo-rollouts-in-action-progressive-delivery-with-canary-blue-green-and-automated-analysis-on-625f7fe9b61a)
 
 ## 🏗️ Architecture
 
@@ -261,8 +261,6 @@ argo-rollouts-in-action/
 │   ├── 04-demo-scenarios.sh
 │   ├── 05-teardown.sh
 │   └── open-dashboard.sh
-├── docs/
-│   └── medium-story.md          # Companion Medium article draft
 └── .gitignore
 ```
 
