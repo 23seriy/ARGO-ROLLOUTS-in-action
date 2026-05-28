@@ -7,6 +7,23 @@ set -euo pipefail
 echo "🏀 Argo Rollouts in Action — Installing prerequisites"
 echo "======================================================"
 
+# Check Homebrew
+if ! command -v brew &>/dev/null; then
+  echo "❌ Homebrew is required. Install from https://brew.sh"
+  exit 1
+fi
+
+# Check Docker
+if ! command -v docker &>/dev/null; then
+  echo "❌ Docker Desktop is required. Install from https://docker.com"
+  exit 1
+fi
+if ! docker info &>/dev/null 2>&1; then
+  echo "⚠️  Docker is installed but not running. Please start Docker Desktop."
+  exit 1
+fi
+echo "✅ Docker is running"
+
 install_if_missing() {
   local cmd=$1
   local formula=$2
