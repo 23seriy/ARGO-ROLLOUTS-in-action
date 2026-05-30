@@ -9,6 +9,12 @@ PROFILE="argo-rollouts-demo"
 echo "🏀 Argo Rollouts in Action — Teardown"
 echo "======================================="
 
+read -rp "This will delete the Minikube cluster '$PROFILE'. Continue? (y/N) " answer
+if [[ ! "$answer" =~ ^[Yy]$ ]]; then
+  echo "Cancelled."
+  exit 0
+fi
+
 echo "🗑️  Deleting namespace argo-rollouts-demo …"
 kubectl delete namespace argo-rollouts-demo --ignore-not-found
 
